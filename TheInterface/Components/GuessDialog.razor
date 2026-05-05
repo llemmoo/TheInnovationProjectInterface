@@ -1,0 +1,22 @@
+@using TheInterface.Model
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">Er det her Hito er?</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudStack AlignItems="AlignItems.Center">
+            <MudImage Src="@Card.PhotoUrl" Width="200" Height="300" ObjectFit="ObjectFit.Contain"/>
+            <MudText Typo="Typo.h5">@Card.Name</MudText>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Error" OnClick="() => MudDialog.Cancel()">Nej</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="() => MudDialog.Close(DialogResult.Ok(true))">Ja!</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+[CascadingParameter] IMudDialogInstance MudDialog { get; set; } = null!;
+[Parameter] public CaseCard Card { get; set; } = null!;
+}
