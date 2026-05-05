@@ -1,0 +1,286 @@
+﻿@page "/"
+@using TheInterface.Core
+@using TheInterface.Model
+@inject MicroBitReader MicroBitReader
+@inject IDialogService DialogService
+@implements IDisposable
+
+<PageTitle>INNOVATION PROTOTYPE</PageTitle>
+
+<MudGrid Style="margin-top: 3vh;">
+    <MudItem xs="8">
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudGrid Class="mt-4">
+                    @foreach (var card in _caseCards)
+                    {
+                        var isViable = _candidates.Contains(card);
+
+                        <MudItem xs="2" Style="margin: 0.5vw">
+                            <MudCard
+                                Style="@(isViable ? "" : "opacity: 0.4; filter: grayscale(100%); transition: all 0.3s ease;")">
+                                <MudImage Style="width: 100%" Width="350" Height="150" ObjectFit="ObjectFit.Contain"
+                                          Src="@card.PhotoUrl"/>
+                                <MudCardContent>
+                                    <MudText> @card.Name </MudText>
+                                    @if (!isViable)
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.Close" Color="Color.Error"/>
+                                    }
+                                    else
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success"/>
+                                    }
+                                </MudCardContent>
+                            </MudCard>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </MudPaper>
+        </MudContainer>
+    </MudItem>
+    <MudItem xs="3">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full mx-8" Elevation="4">
+            <MudStack Style="width:100%; padding:16px;">
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true"
+                           OnClick="Reset">
+                    Nulstil målinger
+                </MudButton>
+                @* Sound *@
+                <MudText Typo="Typo.caption">
+                    Sound @(_lockedSound.HasValue ? $"(Målt værdi: {_lockedSound:F2})" : "")</MudText>
+                <MudStack Row="true" AlignItems="AlignItems.Center">
+                    <MudIcon Icon="@Icons.Material.Filled.VolumeOff"/>
+                    <MudSlider
+                        Value="@(_isMeasuringSound ? MicroBitReader.SoundLevel : (_lockedSound ?? MicroBitReader.SoundLevel))"
+                        Min="0.0" Max="1.0" Step="0.01" Disabled="true" Color="Color.Primary" Style="flex:1;"/>
+                    <MudIcon Icon="@Icons.Material.Filled.VolumeUp"/>
+                    <MudButton Variant="Variant.Filled"
+                               Color="@(_isMeasuringSound ? Color.Error : Color.Primary)"
+                               Disabled="@_isMeasuringSound"
+                               OnClick="@(() => Measure("sound"))">
+                        @(_isMeasuringSound ? "Måler..." : "Mål")
+                    </MudButton>
+                </MudStack>
+
+                @* Light *@
+                <MudText Typo="Typo.caption">
+                    Light @(_lockedLight.HasValue ? $"(Målt værdi: {_lockedLight:F2})" : "")</MudText>
+                <MudStack Row="true" AlignItems="AlignItems.Center">
+                    <MudIcon Icon="@Icons.Material.Filled.DarkMode"/>
+                    <MudSlider
+                        Value="@(_isMeasuringLight ? MicroBitReader.LightLevel : (_lockedLight ?? MicroBitReader.LightLevel))"
+                        Min="0.0" Max="1.0" Step="0.01" Disabled="true" Color="Color.Warning" Style="flex:1;"/>
+                    <MudIcon Icon="@Icons.Material.Filled.LightMode"/>
+                    <MudButton Variant="Variant.Filled"
+                               Color="@(_isMeasuringLight ? Color.Error : Color.Primary)"
+                               Disabled="@_isMeasuringLight"
+                               OnClick="@(() => Measure("light"))">
+                        @(_isMeasuringLight ? "Måler..." : "Mål")
+                    </MudButton>
+                </MudStack>
+
+                @* Temperature *@
+                <MudText Typo="Typo.caption">
+                    Temperature @(_lockedTemp.HasValue ? $"(Målt værdi: {_lockedTemp:F2})" : "")</MudText>
+                <MudStack Row="true" AlignItems="AlignItems.Center">
+                    <MudIcon Icon="@Icons.Material.Filled.AcUnit"/>
+                    <MudSlider
+                        Value="@(_isMeasuringTemp ? MicroBitReader.TemperatureLevel : (_lockedTemp ?? MicroBitReader.TemperatureLevel))"
+                        Min="0.0" Max="1.0" Step="0.01" Disabled="true" Color="Color.Error" Style="flex:1;"/>
+                    <MudIcon Icon="@Icons.Material.Filled.Whatshot"/>
+                    <MudButton Variant="Variant.Filled"
+                               Color="@(_isMeasuringTemp ? Color.Error : Color.Primary)"
+                               Disabled="@_isMeasuringTemp"
+                               OnClick="@(() => Measure("temp"))">
+                        @(_isMeasuringTemp ? "Måler..." : "Mål")
+                    </MudButton>
+                </MudStack>
+
+                @* Shake *@
+                <MudText Typo="Typo.caption">
+                    Shake @(_lockedShake.HasValue ? $"(Målt værdi: {_lockedShake:F2})" : "")</MudText>
+                <MudStack Row="true" AlignItems="AlignItems.Center">
+                    <MudIcon Icon="@Icons.Material.Filled.SelfImprovement"/>
+                    <MudSlider
+                        Value="@(_isMeasuringShake ? MicroBitReader.ShakeLevel : (_lockedShake ?? MicroBitReader.ShakeLevel))"
+                        Min="0.0" Max="1.0" Step="0.01" Disabled="true" Color="Color.Success" Style="flex:1;"/>
+                    <MudIcon Icon="@Icons.Material.Filled.DirectionsRun"/>
+                    <MudButton Variant="Variant.Filled"
+                               Color="@(_isMeasuringShake ? Color.Error : Color.Primary)"
+                               Disabled="@_isMeasuringShake"
+                               OnClick="@(() => Measure("shake"))">
+                        @(_isMeasuringShake ? "Måler..." : "Mål")
+                    </MudButton>
+                </MudStack>
+
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@if (_confirmedCard is not null)
+{
+    <MudOverlay Visible="true" DarkBackground="true" @onclick="() => _confirmedCard = null">
+        <MudStack AlignItems="AlignItems.Center">
+            <MudImage Src="@_confirmedCard.PhotoUrl" Width="400" Height="600" ObjectFit="ObjectFit.Contain"/>
+            <MudText Typo="Typo.h3" Style="color:white;">@_confirmedCard.Name</MudText>
+            <MudText Style="color:white;">Tryk for at lukke</MudText>
+        </MudStack>
+    </MudOverlay>
+}
+
+@code {
+    private bool _isMeasuringSound, _isMeasuringLight, _isMeasuringTemp, _isMeasuringShake;
+    private bool _dialogOpen = false;
+    private float? _lockedSound, _lockedLight, _lockedTemp, _lockedShake;
+    private CaseGuesser? _caseGuesser;
+    private MicroBitReader? _microBitReader;
+    private List<CaseCard> _candidates = [];
+    
+    private bool _showGuessDialog;
+    private CaseCard? _confirmedCard;
+
+    private string _HitoGenderText = "Hito ved ikke hvad de er";
+    private string _HitoLightText = "Hito kan ikke se noget";
+    private string _HitoSoundText = "Hito kan ikke høre noget";
+    private string _HitoActivityText = "Hito kan ikke mærke noget";
+    private string _hitoEnviromentText = "Hito kan ikke mærke noget";
+
+    private List<CaseCard> _caseCards =
+    [
+        // Pair 1 — dark, silent, still
+        new() { Name = "Månen",       LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/Moon.png" }, // cold
+        new() { Name = "I Pyramiden", LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Pyramids.png"}, // hot
+
+        // Pair 2 — bright, silent, still
+        new() { Name = "Nordpolen",   LightValue = 0.75f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/NorthPole.png"}, // cold
+        new() { Name = "Safari",      LightValue = 0.75f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Safari.png"}, // hot
+
+        // Pair 3 — dark, loud, moving
+        new() { Name = "På bunden",   LightValue = 0.25f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/BottomOcean.png"  }, // cold
+        new() { Name = "Drage",       LightValue = 0.25f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Dragon.png" }, // hot
+
+        // Pair 4 — bright, loud, moving
+        new() { Name = "Pirat",       LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/Pirate.png"}, // cold
+        new() { Name = "Tivoli",      LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Tivoli.png" }, // hot
+    ];
+
+    protected override void OnInitialized()
+    {
+        _caseGuesser = new CaseGuesser(_caseCards);
+        _candidates = _caseCards;
+        MicroBitReader.OnSoundLevelChanged += Update;
+        MicroBitReader.OnLightLevelChanged += Update;
+        MicroBitReader.OnTemperatureLevelChanged += Update;
+        MicroBitReader.OnShakeLevelChanged += Update;
+    }
+    
+    private void Reset()
+    {
+        _lockedSound = null;
+        _lockedLight = null;
+        _lockedTemp = null;
+        _lockedShake = null;
+        _isMeasuringSound = false;
+        _isMeasuringLight = false;
+        _isMeasuringTemp = false;
+        _isMeasuringShake = false;
+        _candidates = _caseCards;
+        _confirmedCard = null;
+        _showGuessDialog = false;
+    }
+    
+    private void ConfirmGuess()
+    {
+        _confirmedCard = _candidates[0];
+        _showGuessDialog = false;
+    }
+
+    private void Update()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MicroBitReader.OnSoundLevelChanged -= Update;
+        MicroBitReader.OnLightLevelChanged -= Update;
+        MicroBitReader.OnTemperatureLevelChanged -= Update;
+        MicroBitReader.OnShakeLevelChanged -= Update;
+    }
+
+    private async Task Measure(string sensor)
+    {
+        switch (sensor)
+        {
+            case "sound": _isMeasuringSound = true; break;
+            case "light": _isMeasuringLight = true; break;
+            case "temp": _isMeasuringTemp = true; break;
+            case "shake": _isMeasuringShake = true; break;
+        }
+
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(7000); // 5 second window
+
+        switch (sensor)
+        {
+            case "sound":
+                _lockedSound = MicroBitReader.SoundLevel;
+                _isMeasuringSound = false;
+                break;
+            case "light":
+                _lockedLight = MicroBitReader.LightLevel;
+                _isMeasuringLight = false;
+                break;
+            case "temp":
+                _lockedTemp = MicroBitReader.TemperatureLevel;
+                _isMeasuringTemp = false;
+                break;
+            case "shake":
+                _lockedShake = MicroBitReader.ShakeLevel;
+                _isMeasuringShake = false;
+                break;
+        }
+
+        Evaluate();
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+    private async void Evaluate()
+    {
+        var readings = new List<SensorReading>();
+
+        if (_lockedSound.HasValue)
+            readings.Add(new(c => c.VolumeValue,      _lockedSound.Value, 0.25f));
+        if (_lockedLight.HasValue)
+            readings.Add(new(c => c.LightValue,       _lockedLight.Value, 0.25f));
+        if (_lockedTemp.HasValue)
+            readings.Add(new(c => c.TemperatureValue, _lockedTemp.Value,  0.25f));
+        if (_lockedShake.HasValue)
+            readings.Add(new(c => c.MovementValue,    _lockedShake.Value, 0.25f));
+
+        _candidates = readings.Any()
+            ? _caseGuesser!.Evaluate(readings).ToList()
+            : _caseCards;
+
+        if (_candidates.Count == 1 && !_dialogOpen)
+        {
+            _dialogOpen = true;
+            var parameters = new DialogParameters<GuessDialog>
+            {
+                { x => x.Card, _candidates[0] }
+            };
+            var result = await DialogService.ShowAsync<GuessDialog>("", parameters);
+            var dialogResult = await result.Result;
+
+            if (!dialogResult.Canceled)
+                _confirmedCard = _candidates[0];
+
+            _dialogOpen = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+}
