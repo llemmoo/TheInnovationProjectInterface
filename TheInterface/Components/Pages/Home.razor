@@ -177,6 +177,7 @@
     private bool _isMeasuringSound, _isMeasuringLight, _isMeasuringTemp, _isMeasuringShake;
     private bool _dialogOpen;
     private float? _lockedSound, _lockedLight, _lockedTemp, _lockedShake;
+    private CancellationTokenSource? _botResetCts;
     private string _dataBotText;
     private CaseGuesser? _caseGuesser;
     private List<CaseCard> _candidates = [];
@@ -307,6 +308,7 @@
         MicroBitReader.OnShakeLevelChanged -= Update;
         MicroBitReader.OnSelectedSensorChanged -= Update;
         MicroBitReader.OnMeasureChanged -= OnMeasureChanged;
+        _botResetCts?.Cancel();
     }
 
     private async Task Measure(string sensor)
@@ -341,7 +343,14 @@
                 _isMeasuringShake = false;
                 break;
         }
-
+        await UpdateBotText(sensor, sensor switch          // ← add this
+        {
+            "sound" => _lockedSound!.Value,
+            "light" => _lockedLight!.Value,
+            "temp"  => _lockedTemp!.Value,
+            "shake" => _lockedShake!.Value,
+            _       => 0f
+        });
         await Evaluate();
         await InvokeAsync(StateHasChanged);
     }
@@ -371,5 +380,35 @@
             _dialogOpen = false;
             await InvokeAsync(StateHasChanged);
         }
+    }
+    
+    private async Task UpdateBotText(string sensor, float value)
+    {
+        // Cancel any pending reset
+        _botResetCts?.Cancel();
+        _botResetCts = new CancellationTokenSource();
+
+        _dataBotText = (sensor, value > 0.5f) switch
+        {
+            ("sound", true)  => "Hovsa, det larmer! 🔊",
+            ("sound", false) => "Stille og roligt... næsten uhyggeligt! 🤫",
+            ("light", true)  => "Wow, der er lyst i drømmen! ☀️",
+            ("light", false) => "Det er godt nok mørkt hva? 🌑",
+            ("temp",  true)  => "Puh, det er varmt her! 🥵",
+            ("temp",  false) => "Brr, det er koldt! 🥶",
+            ("shake", true)  => "Hold fast, det rokker! 🫨",
+            ("shake", false) => "Rolig som en sø! 🧘",
+            _                => _dataBotText
+        };
+
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            await Task.Delay(2500, _botResetCts.Token);
+            _dataBotText = "Jeg venter på din næste måling!";
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (TaskCanceledException) { }
     }
 }

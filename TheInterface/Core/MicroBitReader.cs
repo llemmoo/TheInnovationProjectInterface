@@ -68,7 +68,7 @@ public class MicroBitReader : BackgroundService
 
                 if (int.TryParse(dataSplit[2], out var temperature))
                 {
-                    TemperatureLevel = Math.Clamp((temperature - 19f) / 7f, 0f, 1f);
+                    TemperatureLevel = Math.Clamp((temperature - 25f) / 4f, 0f, 1f);
                     OnTemperatureLevelChanged?.Invoke();
                 }
                 
