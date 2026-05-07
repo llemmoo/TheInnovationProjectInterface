@@ -1,0 +1,40 @@
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h4" Align="Align.Center">Hjælp mig med at finde Hito! 🤖</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudStack Spacing="3">
+            <MudText>
+                Hito er faret vild i en drøm og har brug for vores hjælp!
+                <br/>
+                <br/>
+                Jeg er Databotten og har brug for at du fortæller mig hvor Hito er!
+            </MudText>
+            <MudDivider/>
+            <MudText Typo="Typo.subtitle1"><b>Sådan hjælper i mig</b></MudText>
+            <MudText><b>Vælg en sensor!</b> — I skifter mellem de forskellige sensorer jeg måler med ved at bruge de to knapper på forsiden af micro:bitten</MudText>
+            <MudText><b>Micro:bitten tæller til 5 og husker det sidste du gjorde!</b> Gemte den ikke det rigtige? Tryk da på "nulstil" udfra den sensor du vil prøve med igen.</MudText>
+            <MudText>🗣️ <b>Lyd</b> — Vælg højtaleren og tryk på den store knap. Larmer det hos Hito, eller er der stille? Optag med micro:bitten.</MudText>
+            <MudText>☀️ <b>Lys</b> — Er der lyst hvor Hito er? Hold micro:bit mod eller væk fra lyset og tryk på den store knap for at måle det.</MudText>
+            <MudText>🌡️ <b>Temperatur</b> — Er der koldt eller varmt hvor Hito er? Køl eller varm micro:bit og tryk på den store knap!</MudText>
+            <MudText>🫨 <b>Ryste</b> — Er Hito i bevægelse? Ryst eller hold micro:bitten stille og tryk på den store knap for at hjælpe mig.</MudText>
+            <MudDivider/>
+            <MudText>
+                For hvert mål I tager, kan jeg nemmere gætte hvor Hito er.
+                <br/>
+                <br/>
+                Brug alle 4 sensorer for at finde frem til ét sted og fortæl mig om jeg har fundet Hito!
+            </MudText>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true"
+                   OnClick="() => MudDialog.Close()">
+            Lad os hjælpe Hito!
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = null!;
+}

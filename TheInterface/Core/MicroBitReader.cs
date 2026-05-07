@@ -1,4 +1,5 @@
 using System.IO.Ports;
+using TheInterface.Model;
 
 namespace TheInterface.Core;
 
@@ -13,11 +14,17 @@ public class MicroBitReader : BackgroundService
     public float LightLevel { get; private set; }
     public float TemperatureLevel { get; private set; }
     public float ShakeLevel { get; private set; }
+    
+    public Sensor SelectedSensor { get; private set; }
+    
+    public bool Measure { get; private set; }
     public bool IsLightConnected { get; private set; }
     public event Action? OnSoundLevelChanged;
     public event Action? OnLightLevelChanged;
     public event Action? OnTemperatureLevelChanged;
     public event Action? OnShakeLevelChanged;
+    public event Action? OnSelectedSensorChanged;
+    public event Action? OnMeasureChanged;
 
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -76,12 +83,46 @@ public class MicroBitReader : BackgroundService
                         _shakeHistory.Dequeue();
                     ShakeLevel = _shakeHistory.Average();
                     OnShakeLevelChanged?.Invoke();
+                } 
+                
+                if (dataSplit.Length < 5) continue;
+
+
+                if (int.TryParse(dataSplit[4], out var selectedSensor))
+                {
+                    switch (selectedSensor)
+                    {
+                        case 0:
+                            SelectedSensor = Sensor.Sound;
+                            break;
+                        case 1:
+                            SelectedSensor = Sensor.Light;
+                            break;
+                        case 2:
+                            SelectedSensor = Sensor.Temperature;
+                            break;
+                        case 3:
+                            SelectedSensor = Sensor.Shake;
+                            break;
+                    }
+                    OnSelectedSensorChanged?.Invoke();
+                } 
+                
+                if (dataSplit.Length < 6) continue;
+
+
+                if (int.TryParse(dataSplit[5], out var measure))
+                {
+                    Measure = measure == 1;
+                    OnMeasureChanged?.Invoke();
                 }
 
                 Console.WriteLine($"Sound level: {soundLevel}");
                 Console.WriteLine($"Light level: {lightLevel}");
                 Console.WriteLine($"Temperature: {temperature}");
                 Console.WriteLine($"Shake: {shake}");
+                Console.WriteLine($"Selected sensor: {selectedSensor}");
+                Console.WriteLine($"Measure: {measure}");
 
                 await Task.Delay(10, stoppingToken);
             }
