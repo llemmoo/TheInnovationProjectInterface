@@ -6,7 +6,7 @@
 @inject IDialogService DialogService
 @implements IDisposable
 
-<PageTitle>HJÆLP DATABOTTEN MED AT FINDE HITO</PageTitle>
+<PageTitle>DATABOTTENS </PageTitle>
 
 <MudGrid Style="margin-top: 3vh;">
     <MudItem xs="8">
@@ -14,16 +14,35 @@
             <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
                 <MudGrid Class="mt-4">
                     <MudItem xs=12 Style="justify-self:center; align-self: center; margin: 0.5vw">
-                        <MudCard Style="align-items: center; justify-items: center;">
-                            <MudText Typo="Typo.h1">🤖</MudText>
-                            <MudText Typo="Typo.h5">@_dataBotText</MudText>
+                        <MudCard Style="align-items: flex-end;">
+                            <MudStack Row="true">
+                                <MudText Typo="Typo.h1">🤖</MudText>
+                                <div style="position: relative; margin-top: 8px;">
+                                    <!-- Tail pointing left toward the robot -->
+                                    <div style="
+                                    position: absolute;
+                                    left: -10px;
+                                    top: 16px;
+                                    width: 0;
+                                    height: 0;
+                                    border-top: 8px solid transparent;
+                                    border-bottom: 8px solid transparent;
+                                    border-right: 10px solid #e0e0e0;
+                                "></div>
+                                    <!-- Speech bubble body -->
+                                    <MudPaper Elevation="2" Style="@($"background-color: {_bubbleColor}; color: {_bubbleTextColor}; border-radius: 18px; padding: 12px 18px; max-width: 280px; font-size: 1.25rem; line-height: 1.5; transition: background-color 0.4s ease, color 0.4s ease;")">
+                                        @_dataBotText
+                                    </MudPaper>
+                                </div>
+                            </MudStack>
                         </MudCard>
                     </MudItem>
                     @foreach (var card in _caseCards)
                     {
                         var isViable = _candidates.Contains(card);
                         <MudItem xs="3" Style="margin: 0vw">
-                            <MudCard Style="@(isViable ? "" : "opacity: 0.4; filter: grayscale(100%); transition: all 0.3s ease;")">
+                            <MudCard
+                                Style="@(isViable ? "" : "opacity: 0.4; filter: grayscale(100%); transition: all 0.3s ease;")">
                                 <MudImage Style="width: 100%" Width="500" Height="150" ObjectFit="ObjectFit.Contain"
                                           Src="@card.PhotoUrl"/>
                                 <MudCardContent>
@@ -48,6 +67,7 @@
     <MudItem xs="3">
         <MudPaper Class="d-flex align-center justify-center mud-width-full mx-8" Elevation="4">
             <MudStack Style="width:100%; padding:16px;">
+                <MudText Typo="Typo.button" Style="align-self: center; font-size: large;">DRØMMEDATA</MudText>
                 <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true"
                            OnClick="ResetAll">
                     Nulstil målinger
@@ -55,40 +75,48 @@
                 @if (_lockedSound.HasValue)
                 {
                     <MudStack Row="true">
-                        <MudChip T="string" Color="Color.Primary" Size="Size.Small">
+                        <MudChip T="string" Color="Color.Primary" Size="Size.Large">
                             🔊 Målt: @(_lockedSound.Value.ToString("F2"))
                         </MudChip>
-                        <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => Reset(Sensor.Sound))">Nulstil</MudButton>
+                        <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => Reset(Sensor.Sound))">
+                            Nulstil
+                        </MudButton>
                     </MudStack>
                 }
                 @if (_lockedLight.HasValue)
                 {
                     <MudStack Row="true">
-                        <MudChip T="string" Color="Color.Warning" Size="Size.Small">
+                        <MudChip T="string" Color="Color.Warning" Size="Size.Large">
                             💡 Målt: @(_lockedLight.Value.ToString("F2"))
                         </MudChip>
-                        <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => Reset(Sensor.Light))">Nulstil</MudButton>
+                        <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => Reset(Sensor.Light))">
+                            Nulstil
+                        </MudButton>
                     </MudStack>
                 }
                 @if (_lockedTemp.HasValue)
                 {
                     <MudStack Row="true">
-                        <MudChip T="string" Color="Color.Error" Size="Size.Small">
+                        <MudChip T="string" Color="Color.Error" Size="Size.Large">
                             🌡️ Målt: @(_lockedTemp.Value.ToString("F2"))
                         </MudChip>
-                        <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => Reset(Sensor.Temperature))">Nulstil</MudButton>
+                        <MudButton Variant="Variant.Filled" Size="Size.Small"
+                                   OnClick="@(() => Reset(Sensor.Temperature))">Nulstil
+                        </MudButton>
                     </MudStack>
                 }
                 @if (_lockedShake.HasValue)
                 {
                     <MudStack Row="true" Justify="Justify.Center">
-                        <MudChip T="string" Color="Color.Success" Size="Size.Small">
+                        <MudChip T="string" Color="Color.Success" Size="Size.Large">
                             🫨 Målt: @(_lockedShake.Value.ToString("F2"))
                         </MudChip>
-                        <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => Reset(Sensor.Shake))">Nulstil</MudButton>
+                        <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => Reset(Sensor.Shake))">
+                            Nulstil
+                        </MudButton>
                     </MudStack>
                 }
-                
+
                 @switch (MicroBitReader.SelectedSensor)
                 {
                     case Sensor.Sound:
@@ -184,17 +212,19 @@
     private bool _showGuessDialog;
     private CaseCard? _confirmedCard;
     private bool _showConfetti;
+    private string _bubbleColor = "#e0e0e0";
+    private string _bubbleTextColor = "#212121";
 
     private List<CaseCard> _caseCards =
     [
-        new() { Name = "Månen",       LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/Moon.png" },
-        new() { Name = "I Pyramiden", LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Pyramids.png" },
-        new() { Name = "Nordpolen",   LightValue = 0.75f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/NorthPole.png" },
-        new() { Name = "Safari",      LightValue = 0.75f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Safari.png" },
-        new() { Name = "På bunden",   LightValue = 0.25f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/BottomOcean.png" },
-        new() { Name = "Drage",       LightValue = 0.25f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Dragon.png" },
-        new() { Name = "Pirat",       LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/Pirate.png" },
-        new() { Name = "Tivoli",      LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Tivoli.png" },
+        new() { Name = "Månen", LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/Moon.png" },
+        new() { Name = "I Pyramiden", LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.75f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Pyramids.png" },
+        new() { Name = "Nordpolen", LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.25f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/NorthPole.png" },
+        new() { Name = "Safari", LightValue = 0.75f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Safari.png" },
+        new() { Name = "På bunden", LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.75f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/BottomOcean.png" },
+        new() { Name = "Superhelt", LightValue = 0.75f, VolumeValue = 0.25f, MovementValue = 0.75f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/Dragon.png" },
+        new() { Name = "Pirat", LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Pirate.png" },
+        new() { Name = "Tivoli", LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Tivoli.png" },
     ];
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -232,22 +262,22 @@
 
         var alreadyMeasuring = MicroBitReader.SelectedSensor switch
         {
-            Sensor.Sound       => _isMeasuringSound,
-            Sensor.Light       => _isMeasuringLight,
+            Sensor.Sound => _isMeasuringSound,
+            Sensor.Light => _isMeasuringLight,
             Sensor.Temperature => _isMeasuringTemp,
-            Sensor.Shake       => _isMeasuringShake,
-            _                  => false
+            Sensor.Shake => _isMeasuringShake,
+            _ => false
         };
 
         if (alreadyMeasuring) return;
 
         var sensorKey = MicroBitReader.SelectedSensor switch
         {
-            Sensor.Sound       => "sound",
-            Sensor.Light       => "light",
+            Sensor.Sound => "sound",
+            Sensor.Light => "light",
             Sensor.Temperature => "temp",
-            Sensor.Shake       => "shake",
-            _                  => null
+            Sensor.Shake => "shake",
+            _ => null
         };
 
         if (sensorKey is null) return;
@@ -263,8 +293,8 @@
         _candidates = _caseCards;
         _confirmedCard = null;
         _showGuessDialog = false;
-    }    
-    
+    }
+
     private async Task Reset(Sensor sensorToReset)
     {
         switch (sensorToReset)
@@ -274,7 +304,7 @@
                 break;
             case Sensor.Light:
                 _lockedLight = null;
-                break; 
+                break;
             case Sensor.Temperature:
                 _lockedTemp = null;
                 break;
@@ -282,9 +312,8 @@
                 _lockedShake = null;
                 break;
         }
-        
-        await Evaluate();
 
+        await Evaluate();
     }
 
     private async Task ConfirmGuess()
@@ -317,9 +346,10 @@
         {
             case "sound": _isMeasuringSound = true; break;
             case "light": _isMeasuringLight = true; break;
-            case "temp":  _isMeasuringTemp  = true; break;
+            case "temp": _isMeasuringTemp = true; break;
             case "shake": _isMeasuringShake = true; break;
         }
+
         await InvokeAsync(StateHasChanged);
 
         await Task.Delay(7000); // 5-second window
@@ -343,13 +373,14 @@
                 _isMeasuringShake = false;
                 break;
         }
-        await UpdateBotText(sensor, sensor switch          // ← add this
+
+        await UpdateBotText(sensor, sensor switch // ← add this
         {
             "sound" => _lockedSound!.Value,
             "light" => _lockedLight!.Value,
-            "temp"  => _lockedTemp!.Value,
+            "temp" => _lockedTemp!.Value,
             "shake" => _lockedShake!.Value,
-            _       => 0f
+            _ => 0f
         });
         await Evaluate();
         await InvokeAsync(StateHasChanged);
@@ -358,10 +389,10 @@
     private async Task Evaluate()
     {
         var readings = new List<SensorReading>();
-        if (_lockedSound.HasValue) readings.Add(new(c => c.VolumeValue,      _lockedSound.Value, 0.25f));
-        if (_lockedLight.HasValue) readings.Add(new(c => c.LightValue,       _lockedLight.Value, 0.25f));
-        if (_lockedTemp.HasValue)  readings.Add(new(c => c.TemperatureValue, _lockedTemp.Value,  0.25f));
-        if (_lockedShake.HasValue) readings.Add(new(c => c.MovementValue,    _lockedShake.Value, 0.25f));
+        if (_lockedSound.HasValue) readings.Add(new(c => c.VolumeValue, _lockedSound.Value, 0.25f));
+        if (_lockedLight.HasValue) readings.Add(new(c => c.LightValue, _lockedLight.Value, 0.25f));
+        if (_lockedTemp.HasValue) readings.Add(new(c => c.TemperatureValue, _lockedTemp.Value, 0.25f));
+        if (_lockedShake.HasValue) readings.Add(new(c => c.MovementValue, _lockedShake.Value, 0.25f));
 
         _candidates = readings.Any()
             ? _caseGuesser!.Evaluate(readings).ToList()
@@ -381,7 +412,7 @@
             await InvokeAsync(StateHasChanged);
         }
     }
-    
+
     private async Task UpdateBotText(string sensor, float value)
     {
         // Cancel any pending reset
@@ -390,25 +421,32 @@
 
         _dataBotText = (sensor, value > 0.5f) switch
         {
-            ("sound", true)  => "Hovsa, det larmer! 🔊",
+            ("sound", true) => "Hovsa, det larmer! 🔊",
             ("sound", false) => "Stille og roligt... næsten uhyggeligt! 🤫",
-            ("light", true)  => "Wow, der er lyst i drømmen! ☀️",
+            ("light", true) => "Wow, der er lyst i drømmen! ☀️",
             ("light", false) => "Det er godt nok mørkt hva? 🌑",
-            ("temp",  true)  => "Puh, det er varmt her! 🥵",
-            ("temp",  false) => "Brr, det er koldt! 🥶",
-            ("shake", true)  => "Hold fast, det rokker! 🫨",
+            ("temp", true) => "Puh, det er varmt her! 🥵",
+            ("temp", false) => "Brr, det er koldt! 🥶",
+            ("shake", true) => "Hold fast, det rokker! 🫨",
             ("shake", false) => "Rolig som en sø! 🧘",
-            _                => _dataBotText
+            _ => _dataBotText
         };
+        _bubbleColor = "#1976d2";
+        _bubbleTextColor = "#ffffff";
 
         await InvokeAsync(StateHasChanged);
 
         try
         {
-            await Task.Delay(2500, _botResetCts.Token);
+            await Task.Delay(6000, _botResetCts.Token);
+            _bubbleColor = "#e0e0e0";
+            _bubbleTextColor = "#212121";
             _dataBotText = "Jeg venter på din næste måling!";
             await InvokeAsync(StateHasChanged);
         }
-        catch (TaskCanceledException) { }
+        catch (TaskCanceledException)
+        {
+        }
     }
+
 }
