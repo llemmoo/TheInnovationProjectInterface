@@ -43,8 +43,7 @@
                         <MudItem xs="3" Style="margin: 0vw">
                             <MudCard
                                 Style="@(isViable ? "" : "opacity: 0.4; filter: grayscale(100%); transition: all 0.3s ease;")">
-                                <MudImage Style="width: 100%" Width="500" Height="150" ObjectFit="ObjectFit.Contain"
-                                          Src="@card.PhotoUrl"/>
+                                <MudCardMedia Style="@($"background-color: {card.Color}; height: 150px;")" />
                                 <MudCardContent>
                                     <MudText>@card.Name</MudText>
                                     @if (!isViable)
@@ -194,7 +193,7 @@
 {
     <MudOverlay Visible="true" DarkBackground="true" @onclick="() => _confirmedCard = null">
         <MudStack AlignItems="AlignItems.Center">
-            <MudImage Src="@_confirmedCard.PhotoUrl" Width="1000" Height="600" ObjectFit="ObjectFit.Contain"/>
+            <MudImage Src="@_confirmedCard.Color" Width="1000" Height="600" ObjectFit="ObjectFit.Contain"/>
             <MudText Typo="Typo.h3" Style="color:white;">@_confirmedCard.Name</MudText>
             <MudText Style="color:white;">Sådan! Vi fandt Hito!</MudText>
         </MudStack>
@@ -217,14 +216,14 @@
 
     private List<CaseCard> _caseCards =
     [
-        new() { Name = "Månen", LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/Moon.png" },
-        new() { Name = "I Pyramiden", LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.75f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Pyramids.png" },
-        new() { Name = "Nordpolen", LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.25f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/NorthPole.png" },
-        new() { Name = "Safari", LightValue = 0.75f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Safari.png" },
-        new() { Name = "På bunden", LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.75f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/BottomOcean.png" },
-        new() { Name = "Superhelt", LightValue = 0.75f, VolumeValue = 0.25f, MovementValue = 0.75f, TemperatureValue = 0.25f, PhotoUrl = "./Images/CaseCards/Dragon.png" },
-        new() { Name = "Pirat", LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Pirate.png" },
-        new() { Name = "Tivoli", LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.75f, PhotoUrl = "./Images/CaseCards/Tivoli.png" },
+        new() { Name = "Månen", LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.25f, Color = "#B0BEC5" },
+        new() { Name = "I Pyramiden", LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.75f, TemperatureValue = 0.75f, Color = "#F9A825" },
+        new() { Name = "Nordpolen", LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.25f, TemperatureValue = 0.25f, Color = "#90CAF9" },
+        new() { Name = "Safari", LightValue = 0.75f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.75f, Color = "#8D6E63" },
+        new() { Name = "På bunden", LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.75f, TemperatureValue = 0.25f, Color = "#0D47A1" },
+        new() { Name = "Superhelt", LightValue = 0.75f, VolumeValue = 0.25f, MovementValue = 0.75f, TemperatureValue = 0.25f, Color = "#6A1B9A" },
+        new() { Name = "Pirat", LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.75f, Color = "#BF360C" },
+        new() { Name = "Tivoli", LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.75f, Color = "#F48FB1" },
     ];
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

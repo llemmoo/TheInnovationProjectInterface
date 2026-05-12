@@ -9,6 +9,6 @@ public class CaseCard
     
     public float TemperatureValue { get; set; }
     public GenderEnum AssumedGender { get; set; }
-    public string? PhotoUrl { get; set; }
+    public string? Color { get; set; }
     
 }
