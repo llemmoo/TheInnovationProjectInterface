@@ -7,16 +7,16 @@ public class MicroBitReader : BackgroundService
 {
     private const string Port = "/dev/tty.usbmodem3102";
     private const int BaudRate = 115200;
-    
+
     private readonly Queue<float> _shakeHistory = new();
     private const int ShakeWindow = 20; // ~2 seconds at 100ms intervals
     public float SoundLevel { get; private set; }
     public float LightLevel { get; private set; }
     public float TemperatureLevel { get; private set; }
     public float ShakeLevel { get; private set; }
-    
+
     public Sensor SelectedSensor { get; private set; }
-    
+
     public bool Measure { get; private set; }
     public bool IsLightConnected { get; private set; }
     public event Action? OnSoundLevelChanged;
@@ -30,14 +30,14 @@ public class MicroBitReader : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var port = new SerialPort(Port, BaudRate);
-        
+
         port.ReadTimeout = 2000;
         port.NewLine = "\r\n";
 
         Console.WriteLine($"Opening {Port} at {BaudRate} baud...");
         port.Open();
         Console.WriteLine("Connected! Reading microphone data. Press Ctrl+C to stop.\n");
-            
+
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -53,17 +53,17 @@ public class MicroBitReader : BackgroundService
                     SoundLevel = soundLevel / 255f;
                     OnSoundLevelChanged?.Invoke();
                 }
-                
+
                 if (dataSplit.Length < 2) continue;
 
-                if (float.TryParse(dataSplit[1], out var lightLevel) && !float.IsNaN(lightLevel) && lightLevel >= 0 )
+                if (float.TryParse(dataSplit[1], out var lightLevel) && !float.IsNaN(lightLevel) && lightLevel >= 0)
                 {
                     LightLevel = lightLevel / 255.0f;
                     OnLightLevelChanged?.Invoke();
                 }
-                
+
                 IsLightConnected = !float.IsNaN(lightLevel) && lightLevel >= 0;
-                
+
                 if (dataSplit.Length < 3) continue;
 
                 if (int.TryParse(dataSplit[2], out var temperature))
@@ -71,7 +71,7 @@ public class MicroBitReader : BackgroundService
                     TemperatureLevel = Math.Clamp((temperature - 25f) / 4f, 0f, 1f);
                     OnTemperatureLevelChanged?.Invoke();
                 }
-                
+
                 if (dataSplit.Length < 4) continue;
 
 
@@ -83,8 +83,8 @@ public class MicroBitReader : BackgroundService
                         _shakeHistory.Dequeue();
                     ShakeLevel = _shakeHistory.Average();
                     OnShakeLevelChanged?.Invoke();
-                } 
-                
+                }
+
                 if (dataSplit.Length < 5) continue;
 
 
@@ -94,20 +94,23 @@ public class MicroBitReader : BackgroundService
                     {
                         case 0:
                             SelectedSensor = Sensor.Sound;
+                            OnSelectedSensorChanged?.Invoke();
                             break;
                         case 1:
                             SelectedSensor = Sensor.Light;
+                            OnSelectedSensorChanged?.Invoke();
                             break;
                         case 2:
                             SelectedSensor = Sensor.Temperature;
+                            OnSelectedSensorChanged?.Invoke();
                             break;
                         case 3:
                             SelectedSensor = Sensor.Shake;
+                            OnSelectedSensorChanged?.Invoke();
                             break;
                     }
-                    OnSelectedSensorChanged?.Invoke();
-                } 
-                
+                }
+
                 if (dataSplit.Length < 6) continue;
 
 
