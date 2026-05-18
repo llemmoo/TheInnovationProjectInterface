@@ -118,64 +118,68 @@
                 {
                     case Sensor.Sound:
                         <MudStack>
-                            <MudText Typo="Typo.caption">
+                            <MudText Typo="Typo.button">
                                 Lyd @(_isMeasuringSound ? " — måler..." : "")
                             </MudText>
                             <MudStack Row="true" AlignItems="AlignItems.Center">
-                                <MudIcon Icon="@Icons.Material.Filled.VolumeOff"/>
+                                <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.VolumeOff"/>
                                 <MudSlider
                                     Value="@(_isMeasuringSound ? MicroBitReader.SoundLevel : (_lockedSound ?? MicroBitReader.SoundLevel))"
                                     Min="0.0" Max="1.0" Step="0.01" Disabled="true"
+                                    Size="Size.Large"
                                     Color="Color.Primary" Style="flex:1;"/>
-                                <MudIcon Icon="@Icons.Material.Filled.VolumeUp"/>
+                                <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.VolumeUp"/>
                             </MudStack>
                         </MudStack>
                         break;
 
                     case Sensor.Light:
                         <MudStack>
-                            <MudText Typo="Typo.caption">
+                            <MudText Typo="Typo.button">
                                 Lys @(_isMeasuringLight ? " — måler..." : "")
                             </MudText>
                             <MudStack Row="true" AlignItems="AlignItems.Center">
-                                <MudIcon Icon="@Icons.Material.Filled.DarkMode"/>
+                                <MudIcon Size="Size.Large"  Icon="@Icons.Material.Filled.DarkMode"/>
                                 <MudSlider
                                     Value="@(_isMeasuringLight ? MicroBitReader.LightLevel : (_lockedLight ?? MicroBitReader.LightLevel))"
                                     Min="0.0" Max="1.0" Step="0.01" Disabled="true"
+                                    Size="Size.Large"
                                     Color="Color.Warning" Style="flex:1;"/>
-                                <MudIcon Icon="@Icons.Material.Filled.LightMode"/>
+                                <MudIcon Size="Size.Large"  Icon="@Icons.Material.Filled.LightMode"/>
                             </MudStack>
                         </MudStack>
                         break;
 
                     case Sensor.Temperature:
                         <MudStack>
-                            <MudText Typo="Typo.caption">
+                            <MudText Typo="Typo.button">
                                 Temperatur @(_isMeasuringTemp ? " — måler..." : "")
                             </MudText>
                             <MudStack Row="true" AlignItems="AlignItems.Center">
-                                <MudIcon Icon="@Icons.Material.Filled.AcUnit"/>
+                                <MudIcon Size="Size.Large"  Icon="@Icons.Material.Filled.AcUnit"/>
                                 <MudSlider
                                     Value="@(_isMeasuringTemp ? MicroBitReader.TemperatureLevel : (_lockedTemp ?? MicroBitReader.TemperatureLevel))"
                                     Min="0.0" Max="1.0" Step="0.01" Disabled="true"
+                                    Size="Size.Large"
                                     Color="Color.Error" Style="flex:1;"/>
-                                <MudIcon Icon="@Icons.Material.Filled.Whatshot"/>
+                                <MudIcon Size="Size.Large"  Icon="@Icons.Material.Filled.Whatshot"/>
                             </MudStack>
                         </MudStack>
                         break;
 
                     case Sensor.Shake:
                         <MudStack>
-                            <MudText Typo="Typo.caption">
+                            <MudText Typo="Typo.button">
                                 Bevægelse @(_isMeasuringShake ? " — måler..." : "")
                             </MudText>
                             <MudStack Row="true" AlignItems="AlignItems.Center">
-                                <MudIcon Icon="@Icons.Material.Filled.SelfImprovement"/>
+                                <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.SelfImprovement"/>
                                 <MudSlider
                                     Value="@(_isMeasuringShake ? MicroBitReader.ShakeLevel : (_lockedShake ?? MicroBitReader.ShakeLevel))"
                                     Min="0.0" Max="1.0" Step="0.01" Disabled="true"
+                                    Size="Size.Large"
                                     Color="Color.Success" Style="flex:1;"/>
-                                <MudIcon Icon="@Icons.Material.Filled.DirectionsRun"/>
+                                <MudIcon Size="Size.Large"  Icon="@Icons.Material.Filled.DirectionsRun"/>
                             </MudStack>
                         </MudStack>
                         break;
