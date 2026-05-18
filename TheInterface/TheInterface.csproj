@@ -13,6 +13,7 @@
 
     <ItemGroup>
       <Folder Include="wwwroot\Images\CaseCards\" />
+      <Folder Include="wwwroot\sounds\" />
     </ItemGroup>
 
 </Project>

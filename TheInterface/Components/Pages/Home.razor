@@ -4,7 +4,9 @@
 @using TheInterface.Model
 @inject MicroBitReader MicroBitReader
 @inject IDialogService DialogService
+@inject IJSRuntime JSRuntime
 @implements IDisposable
+
 
 <PageTitle>DATABOTTENS </PageTitle>
 
@@ -71,7 +73,7 @@
                 </MudButton>
                 @if (_lockedSound.HasValue)
                 {
-                    <MudStack Row="true">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween">
                         <MudChip T="string" Color="Color.Primary" Size="Size.Large">
                             🔊 Målt: @(_lockedSound.Value.ToString("F2"))
                         </MudChip>
@@ -82,7 +84,7 @@
                 }
                 @if (_lockedLight.HasValue)
                 {
-                    <MudStack Row="true">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween">
                         <MudChip T="string" Color="Color.Warning" Size="Size.Large">
                             💡 Målt: @(_lockedLight.Value.ToString("F2"))
                         </MudChip>
@@ -93,7 +95,7 @@
                 }
                 @if (_lockedTemp.HasValue)
                 {
-                    <MudStack Row="true">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween">
                         <MudChip T="string" Color="Color.Error" Size="Size.Large">
                             🌡️ Målt: @(_lockedTemp.Value.ToString("F2"))
                         </MudChip>
@@ -104,7 +106,7 @@
                 }
                 @if (_lockedShake.HasValue)
                 {
-                    <MudStack Row="true" Justify="Justify.Center">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween">
                         <MudChip T="string" Color="Color.Success" Size="Size.Large">
                             🫨 Målt: @(_lockedShake.Value.ToString("F2"))
                         </MudChip>
@@ -189,15 +191,21 @@
     </MudItem>
 </MudGrid>
 
+<audio id="possiblyCorrect" src="./sounds/possiblyCorrect.wav" />
+<audio id="tada" src="./sounds/tada.wav" />
+<audio id="notificationSound" src="./sounds/notification.wav" />
+ 
 <ConfettiOverlay Visible="_showConfetti"/>
 
 @if (_confirmedCard is not null)
 {
     <MudOverlay Visible="true" DarkBackground="true" @onclick="() => _confirmedCard = null">
         <MudStack AlignItems="AlignItems.Center">
-            <MudImage Src="@_confirmedCard.Color" Width="1000" Height="600" ObjectFit="ObjectFit.Contain"/>
+            <MudPaper Style="@($"background-color: {_confirmedCard.Color}; width: 1000px; height: 600px;")" 
+                      Elevation="0" 
+                      Square="true" />
             <MudText Typo="Typo.h3" Style="color:white;">@_confirmedCard.Name</MudText>
-            <MudText Style="color:white;">Sådan! Vi fandt Hito!</MudText>
+            <MudText Typo="Typo.h4" Style="color:white;">Sådan! Vi fandt Hito!</MudText>
         </MudStack>
     </MudOverlay>
 }
@@ -255,8 +263,6 @@
         _dataBotText = "Jeg venter på din næste måling!";
     }
 
-    // Called every time measure changes value on the micro:bit.
-    // Only act on the rising edge (measure == true) and only when not already measuring that sensor.
     private void OnMeasureChanged()
     {
         if (!MicroBitReader.Measure) return;
@@ -321,6 +327,7 @@
     {
         _confirmedCard = _candidates[0];
         _showGuessDialog = false;
+        await TriggerTada();
         _showConfetti = true;
         await InvokeAsync(StateHasChanged);
         await Task.Delay(3500);
@@ -401,6 +408,7 @@
 
         if (_candidates.Count == 1 && !_dialogOpen)
         {
+            await TriggerPossiblyCorrect();
             _dialogOpen = true;
             var parameters = new DialogParameters<GuessDialog> { { x => x.Card, _candidates[0] } };
             var result = await DialogService.ShowAsync<GuessDialog>("", parameters);
@@ -411,6 +419,11 @@
 
             _dialogOpen = false;
             await InvokeAsync(StateHasChanged);
+        }
+        else
+        {
+            // Notification sound
+            await TriggerNotification();
         }
     }
 
@@ -448,6 +461,25 @@
         catch (TaskCanceledException)
         {
         }
+    }
+    private async Task PlaySoundAsync(string elementId)
+    {
+        await JSRuntime.InvokeVoidAsync("eval", $"document.getElementById('{elementId}').play()");
+    }
+
+    private async Task TriggerPossiblyCorrect()
+    {
+        await PlaySoundAsync("possiblyCorrect");
+    }
+
+    private async Task TriggerNotification()
+    {
+        await PlaySoundAsync("notificationSound");
+    }
+    
+    private async Task TriggerTada()
+    {
+        await PlaySoundAsync("tada");
     }
 
 }

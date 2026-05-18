@@ -6,7 +6,9 @@
     </TitleContent>
     <DialogContent>
         <MudStack AlignItems="AlignItems.Center">
-            <MudImage Src="@Card.Color" Width="500" Height="300" ObjectFit="ObjectFit.Contain"/>
+            <MudPaper Style="@($"background-color: {Card.Color}; width: 500px; height: 300px;")" 
+                      Elevation="0" 
+                      Square="true" />
             <MudText Typo="Typo.h5">@Card.Name</MudText>
         </MudStack>
     </DialogContent>
