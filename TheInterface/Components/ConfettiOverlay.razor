@@ -3,7 +3,6 @@
     <div class="confetti-overlay">
         @for (int i = 0; i < 60; i++)
         {
-            var index = i;
             <div class="confetti-piece" style="
                 left: @(Random.Shared.Next(0, 100))vw;
                 animation-delay: @(Random.Shared.NextDouble() * 2)s;
@@ -11,7 +10,7 @@
                 width: @(Random.Shared.Next(8, 16))px;
                 height: @(Random.Shared.Next(8, 16))px;
                 transform: rotate(@(Random.Shared.Next(0, 360))deg);
-            "/>
+            "></div>
         }
     </div>
 }

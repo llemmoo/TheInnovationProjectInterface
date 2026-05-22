@@ -8,8 +8,7 @@
 @inject IJSRuntime JsRuntime
 @implements IDisposable
 
-
-<PageTitle>DATABOTTENS </PageTitle>
+<PageTitle>DATA ROBOTTEN</PageTitle>
 
 <MudGrid Style="margin-top: 3vh;">
     <MudItem xs="8">
@@ -31,7 +30,8 @@
                                     border-bottom: 8px solid transparent;
                                     border-right: 10px solid #e0e0e0;
                                 "></div>
-                                    <MudPaper Elevation="2" Style="@($"background-color: {_bubbleColor}; color: {_bubbleTextColor}; border-radius: 18px; padding: 12px 18px; max-width: 280px; font-size: 1.25rem; line-height: 1.5; transition: background-color 0.4s ease, color 0.4s ease;")">
+                                    <MudPaper Elevation="2"
+                                              Style="@($"background-color: {_bubbleColor}; color: {_bubbleTextColor}; border-radius: 18px; padding: 12px 18px; max-width: 280px; font-size: 1.25rem; line-height: 1.5; transition: background-color 0.4s ease, color 0.4s ease;")">
                                         @_dataBotText
                                     </MudPaper>
                                 </div>
@@ -44,7 +44,7 @@
                         <MudItem xs="3" Style="margin: 0">
                             <MudCard
                                 Style="@(isViable ? "" : "opacity: 0.4; filter: grayscale(100%); transition: all 0.3s ease;")">
-                                <MudCardMedia Style="@($"background-color: {dream.Color}; height: 150px;")" />
+                                <MudCardMedia Style="@($"background-color: {dream.Color}; height: 150px;")"/>
                                 <MudCardContent>
                                     <MudText>@dream.Name</MudText>
                                     @if (!isViable)
@@ -142,13 +142,13 @@
                                 Lys @(_isMeasuringLight ? " — måler..." : "")
                             </MudText>
                             <MudStack Row="true" AlignItems="AlignItems.Center">
-                                <MudIcon Size="Size.Large"  Icon="@Icons.Material.Filled.DarkMode"/>
+                                <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.DarkMode"/>
                                 <MudSlider
                                     Value="@(_isMeasuringLight ? MicroBitReader.LightLevel : (_lockedLight ?? MicroBitReader.LightLevel))"
                                     Min="0.0" Max="1.0" Step="0.01" Disabled="true"
                                     Size="Size.Large"
                                     Color="Color.Warning" Style="flex:1;"/>
-                                <MudIcon Size="Size.Large"  Icon="@Icons.Material.Filled.LightMode"/>
+                                <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.LightMode"/>
                             </MudStack>
                         </MudStack>
                         break;
@@ -159,13 +159,13 @@
                                 Temperatur @(_isMeasuringTemp ? " — måler..." : "")
                             </MudText>
                             <MudStack Row="true" AlignItems="AlignItems.Center">
-                                <MudIcon Size="Size.Large"  Icon="@Icons.Material.Filled.AcUnit"/>
+                                <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.AcUnit"/>
                                 <MudSlider
                                     Value="@(_isMeasuringTemp ? MicroBitReader.TemperatureLevel : (_lockedTemp ?? MicroBitReader.TemperatureLevel))"
                                     Min="0.0" Max="1.0" Step="0.01" Disabled="true"
                                     Size="Size.Large"
                                     Color="Color.Error" Style="flex:1;"/>
-                                <MudIcon Size="Size.Large"  Icon="@Icons.Material.Filled.Whatshot"/>
+                                <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Whatshot"/>
                             </MudStack>
                         </MudStack>
                         break;
@@ -182,11 +182,17 @@
                                     Min="0.0" Max="1.0" Step="0.01" Disabled="true"
                                     Size="Size.Large"
                                     Color="Color.Success" Style="flex:1;"/>
-                                <MudIcon Size="Size.Large"  Icon="@Icons.Material.Filled.DirectionsRun"/>
+                                <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.DirectionsRun"/>
                             </MudStack>
                         </MudStack>
                         break;
                 }
+                <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="@(() => _confirmedDream = _candidates.FirstOrDefault())">
+                    TEST
+                </MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="@(() => _candidates = _dreams)">
+                    TEST RESET
+                </MudButton>
             </MudStack>
         </MudPaper>
     </MudItem>
@@ -195,23 +201,82 @@
 <audio id="possiblyCorrect" src="./sounds/possiblyCorrect.wav"></audio>
 <audio id="tada" src="./sounds/tada.wav"></audio>
 <audio id="notificationSound" src="./sounds/notification.wav"></audio>
- 
+
 <ConfettiOverlay Visible="_showConfetti"/>
 
 @if (_confirmedDream is not null)
 {
-    <MudOverlay Visible="true" DarkBackground="true" @onclick="() => _confirmedDream = null">
+    <MudOverlay Visible="true" DarkBackground="true" OnClosed="() => _confirmedDream = null">
         <MudStack AlignItems="AlignItems.Center">
-            <MudPaper Style="@($"background-color: {_confirmedDream.Color}; width: 1000px; height: 600px;")" 
-                      Elevation="0" 
-                      Square="true" />
+            @if (_showInformationBlocks)
+            {
+                <MudPaper Style="width: 1000px; height: 600px; align-items: center; justify-content: space-evenly;"
+                          Elevation="2"
+                          >
+                              <MudGrid Spacing="3" Class="pa-3">
+                                  @foreach (var informationBlock in _confirmedDream!.InformationBlocks!)
+                                  {
+                                      <MudItem xs="12" sm="6">
+                                          <MudCard Elevation="2" Class="h-100">
+                                              <MudCardHeader>
+                                                  <CardHeaderContent>
+                                                      <MudText Typo="Typo.h6" Color="Color.Primary">
+                                                          Information @informationBlock.BlockNumber
+                                                      </MudText>
+                                                  </CardHeaderContent>
+                                              </MudCardHeader>
+                                              <MudCardContent>
+                                                  <MudStack Spacing="2">
+                                                      <div>
+                                                          <MudText Typo="Typo.caption" Color="Color.Secondary">Information</MudText>
+                                                          <MudText Typo="Typo.body2">@informationBlock.BlockInformation</MudText>
+                                                      </div>
+                                                      <MudDivider />
+                                                      <div>
+                                                          <MudText Typo="Typo.caption" Color="Color.Secondary">Ledetråd</MudText>
+                                                          <MudText Typo="Typo.body2">@informationBlock.BlockInformationHighlight</MudText>
+                                                      </div>
+                                                      <MudDivider />
+                                                      <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                                          <div>
+                                                              <MudText Typo="Typo.caption" Color="Color.Secondary">Sensor</MudText>
+                                                              <MudText Typo="Typo.body2">@informationBlock.Sensor</MudText>
+                                                          </div>
+                                                          <MudChip T="string" Color="Color.Info" Size="Size.Small" Variant="Variant.Filled">
+                                                              @informationBlock.SensorReadingValue
+                                                          </MudChip>
+                                                      </MudStack>
+                                                  </MudStack>
+                                              </MudCardContent>
+                                          </MudCard>
+                                      </MudItem>
+                                  }
+                              </MudGrid>
+                </MudPaper>
+                <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="() => _showInformationBlocks = !_showInformationBlocks"
+                           EndIcon="@Icons.Material.Filled.SwitchAccessShortcut">Se drømmefarven igen!
+                </MudButton>
+            }
+            else
+            {
+                <MudPaper Style="@($"background-color: {_confirmedDream.Color}; width: 1000px; height: 600px;")"
+                          Elevation="0">
+                </MudPaper>
+                <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="() => _showInformationBlocks = !_showInformationBlocks"
+                           EndIcon="@Icons.Material.Filled.SwitchAccessShortcut">Se hvordan Data Robotten tolker informationsblokkene!
+                </MudButton>
+            }
             <MudText Typo="Typo.h3" Style="color:white;">@_confirmedDream.Name</MudText>
             <MudText Typo="Typo.h4" Style="color:white;">Sådan! Vi fandt Hito!</MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ResetAll"
+                       EndIcon="@Icons.Material.Filled.Replay"> Prøv igen!
+            </MudButton>
         </MudStack>
     </MudOverlay>
 }
 
 @* ReSharper disable once NotAccessedField.Compiler *@
+
 @code {
     private bool _isMeasuringSound, _isMeasuringLight, _isMeasuringTemp, _isMeasuringShake;
     private bool _dialogOpen;
@@ -225,9 +290,10 @@
     private bool _showGuessDialog;
     private Dream? _confirmedDream;
     private bool _showConfetti;
+    private bool _showInformationBlocks;
     private string _bubbleColor = "#e0e0e0";
     private string _bubbleTextColor = "#212121";
-    
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -248,14 +314,14 @@
         _dreams = _dreamRepository.GetDreams();
         _candidates = _dreams;
         _dreamGuesser = new DreamGuesser(_candidates);
-        
+
         MicroBitReader.OnSoundLevelChanged += Update;
         MicroBitReader.OnLightLevelChanged += Update;
         MicroBitReader.OnTemperatureLevelChanged += Update;
         MicroBitReader.OnShakeLevelChanged += Update;
         MicroBitReader.OnSelectedSensorChanged += Update;
         MicroBitReader.OnMeasureChanged += OnMeasureChanged;
-        
+
         _dataBotText = "Jeg venter på din næste måling!";
     }
 
@@ -458,6 +524,7 @@
         {
         }
     }
+
     private async Task PlaySoundAsync(string elementId)
     {
         await JsRuntime.InvokeVoidAsync("eval", $"document.getElementById('{elementId}').play()");
@@ -472,7 +539,7 @@
     {
         await PlaySoundAsync("notificationSound");
     }
-    
+
     private async Task TriggerTada()
     {
         await PlaySoundAsync("tada");

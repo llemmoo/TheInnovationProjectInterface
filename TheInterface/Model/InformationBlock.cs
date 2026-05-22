@@ -4,8 +4,12 @@ namespace TheInterface.Model;
 public class InformationBlock
 {
     public int BlockNumber { get; set; }
+    
     public string? BlockInformation { get; set; }
+    
     public string? BlockInformationHighlight { get; set; }
+    
     public Sensor Sensor { get; set; }
+    
     public SensorReadingValue SensorReadingValue { get; set; }
 }
