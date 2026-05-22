@@ -1,7 +1,8 @@
 namespace TheInterface.Model;
 
+// Defines a sensor reading, and it's tolerance
 public record SensorReading(
-    Func<CaseCard, float> Property,
+    Func<Dream, float> Property,
     float Value,
     float Tolerance
 );

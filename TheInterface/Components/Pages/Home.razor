@@ -2,9 +2,10 @@
 @using TheInterface.Components.Dialogs
 @using TheInterface.Core
 @using TheInterface.Model
+@using TheInterface.Repository
 @inject MicroBitReader MicroBitReader
 @inject IDialogService DialogService
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
 @implements IDisposable
 
 
@@ -37,15 +38,15 @@
                             </MudStack>
                         </MudCard>
                     </MudItem>
-                    @foreach (var card in _caseCards)
+                    @foreach (var dream in _dreams)
                     {
-                        var isViable = _candidates.Contains(card);
-                        <MudItem xs="3" Style="margin: 0vw">
+                        var isViable = _candidates.Contains(dream);
+                        <MudItem xs="3" Style="margin: 0">
                             <MudCard
                                 Style="@(isViable ? "" : "opacity: 0.4; filter: grayscale(100%); transition: all 0.3s ease;")">
-                                <MudCardMedia Style="@($"background-color: {card.Color}; height: 150px;")" />
+                                <MudCardMedia Style="@($"background-color: {dream.Color}; height: 150px;")" />
                                 <MudCardContent>
-                                    <MudText>@card.Name</MudText>
+                                    <MudText>@dream.Name</MudText>
                                     @if (!isViable)
                                     {
                                         <MudIcon Icon="@Icons.Material.Filled.Close" Color="Color.Error"/>
@@ -191,51 +192,42 @@
     </MudItem>
 </MudGrid>
 
-<audio id="possiblyCorrect" src="./sounds/possiblyCorrect.wav" />
-<audio id="tada" src="./sounds/tada.wav" />
-<audio id="notificationSound" src="./sounds/notification.wav" />
+<audio id="possiblyCorrect" src="./sounds/possiblyCorrect.wav"></audio>
+<audio id="tada" src="./sounds/tada.wav"></audio>
+<audio id="notificationSound" src="./sounds/notification.wav"></audio>
  
 <ConfettiOverlay Visible="_showConfetti"/>
 
-@if (_confirmedCard is not null)
+@if (_confirmedDream is not null)
 {
-    <MudOverlay Visible="true" DarkBackground="true" @onclick="() => _confirmedCard = null">
+    <MudOverlay Visible="true" DarkBackground="true" @onclick="() => _confirmedDream = null">
         <MudStack AlignItems="AlignItems.Center">
-            <MudPaper Style="@($"background-color: {_confirmedCard.Color}; width: 1000px; height: 600px;")" 
+            <MudPaper Style="@($"background-color: {_confirmedDream.Color}; width: 1000px; height: 600px;")" 
                       Elevation="0" 
                       Square="true" />
-            <MudText Typo="Typo.h3" Style="color:white;">@_confirmedCard.Name</MudText>
+            <MudText Typo="Typo.h3" Style="color:white;">@_confirmedDream.Name</MudText>
             <MudText Typo="Typo.h4" Style="color:white;">Sådan! Vi fandt Hito!</MudText>
         </MudStack>
     </MudOverlay>
 }
 
+@* ReSharper disable once NotAccessedField.Compiler *@
 @code {
     private bool _isMeasuringSound, _isMeasuringLight, _isMeasuringTemp, _isMeasuringShake;
     private bool _dialogOpen;
     private float? _lockedSound, _lockedLight, _lockedTemp, _lockedShake;
     private CancellationTokenSource? _botResetCts;
-    private string _dataBotText;
-    private CaseGuesser? _caseGuesser;
-    private List<CaseCard> _candidates = [];
+    private string? _dataBotText;
+    private DreamGuesser? _dreamGuesser;
+    private DreamRepository? _dreamRepository;
+    private List<Dream> _candidates = [];
+    private List<Dream> _dreams = [];
     private bool _showGuessDialog;
-    private CaseCard? _confirmedCard;
+    private Dream? _confirmedDream;
     private bool _showConfetti;
     private string _bubbleColor = "#e0e0e0";
     private string _bubbleTextColor = "#212121";
-
-    private List<CaseCard> _caseCards =
-    [
-        new() { Name = "Månen", LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.25f, Color = "#B0BEC5" },
-        new() { Name = "Pyramiden", LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.75f, TemperatureValue = 0.75f, Color = "#F9A825" },
-        new() { Name = "Nordpolen", LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.25f, TemperatureValue = 0.25f, Color = "#90CAF9" },
-        new() { Name = "Safari", LightValue = 0.75f, VolumeValue = 0.25f, MovementValue = 0.25f, TemperatureValue = 0.75f, Color = "#8D6E63" },
-        new() { Name = "Havet", LightValue = 0.25f, VolumeValue = 0.25f, MovementValue = 0.75f, TemperatureValue = 0.25f, Color = "#0D47A1" },
-        new() { Name = "Superhelt", LightValue = 0.75f, VolumeValue = 0.25f, MovementValue = 0.75f, TemperatureValue = 0.25f, Color = "#6A1B9A" },
-        new() { Name = "Pirat", LightValue = 0.25f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.75f, Color = "#BF360C" },
-        new() { Name = "Tivoli", LightValue = 0.75f, VolumeValue = 0.75f, MovementValue = 0.75f, TemperatureValue = 0.75f, Color = "#F48FB1" },
-    ];
-
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -252,14 +244,18 @@
 
     protected override void OnInitialized()
     {
-        _caseGuesser = new CaseGuesser(_caseCards);
-        _candidates = _caseCards;
+        _dreamRepository = new DreamRepository();
+        _dreams = _dreamRepository.GetDreams();
+        _candidates = _dreams;
+        _dreamGuesser = new DreamGuesser(_candidates);
+        
         MicroBitReader.OnSoundLevelChanged += Update;
         MicroBitReader.OnLightLevelChanged += Update;
         MicroBitReader.OnTemperatureLevelChanged += Update;
         MicroBitReader.OnShakeLevelChanged += Update;
         MicroBitReader.OnSelectedSensorChanged += Update;
         MicroBitReader.OnMeasureChanged += OnMeasureChanged;
+        
         _dataBotText = "Jeg venter på din næste måling!";
     }
 
@@ -297,8 +293,8 @@
     {
         _lockedSound = _lockedLight = _lockedTemp = _lockedShake = null;
         _isMeasuringSound = _isMeasuringLight = _isMeasuringTemp = _isMeasuringShake = false;
-        _candidates = _caseCards;
-        _confirmedCard = null;
+        _candidates = _dreams;
+        _confirmedDream = null;
         _showGuessDialog = false;
     }
 
@@ -325,7 +321,7 @@
 
     private async Task ConfirmGuess()
     {
-        _confirmedCard = _candidates[0];
+        _confirmedDream = _candidates[0];
         _showGuessDialog = false;
         await TriggerTada();
         _showConfetti = true;
@@ -403,18 +399,18 @@
         if (_lockedShake.HasValue) readings.Add(new(c => c.MovementValue, _lockedShake.Value, 0.25f));
 
         _candidates = readings.Any()
-            ? _caseGuesser!.Evaluate(readings).ToList()
-            : _caseCards;
+            ? _dreamGuesser!.Evaluate(readings).ToList()
+            : _dreams;
 
         if (_candidates.Count == 1 && !_dialogOpen)
         {
             await TriggerPossiblyCorrect();
             _dialogOpen = true;
-            var parameters = new DialogParameters<GuessDialog> { { x => x.Card, _candidates[0] } };
+            var parameters = new DialogParameters<GuessDialog> { { x => x.Dream, _candidates[0] } };
             var result = await DialogService.ShowAsync<GuessDialog>("", parameters);
             var dialogResult = await result.Result;
 
-            if (!dialogResult.Canceled)
+            if (!dialogResult!.Canceled)
                 await ConfirmGuess();
 
             _dialogOpen = false;
@@ -464,7 +460,7 @@
     }
     private async Task PlaySoundAsync(string elementId)
     {
-        await JSRuntime.InvokeVoidAsync("eval", $"document.getElementById('{elementId}').play()");
+        await JsRuntime.InvokeVoidAsync("eval", $"document.getElementById('{elementId}').play()");
     }
 
     private async Task TriggerPossiblyCorrect()

@@ -6,10 +6,10 @@
     </TitleContent>
     <DialogContent>
         <MudStack AlignItems="AlignItems.Center">
-            <MudPaper Style="@($"background-color: {Card.Color}; width: 500px; height: 300px;")" 
+            <MudPaper Style="@($"background-color: {Dream.Color}; width: 500px; height: 300px;")" 
                       Elevation="0" 
                       Square="true" />
-            <MudText Typo="Typo.h5">@Card.Name</MudText>
+            <MudText Typo="Typo.h5">@Dream.Name</MudText>
         </MudStack>
     </DialogContent>
     <DialogActions>
@@ -20,5 +20,5 @@
 
 @code {
 [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = null!;
-[Parameter] public CaseCard Card { get; set; } = null!;
+[Parameter] public Dream Dream { get; set; } = null!;
 }

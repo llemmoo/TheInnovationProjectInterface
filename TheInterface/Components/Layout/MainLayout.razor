@@ -1,4 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using TheInterface.Components.Dialogs
+@inherits LayoutComponentBase
+@inject IDialogService DialogService
+
 
 <MudThemeProvider/>
 <MudPopoverProvider/>
@@ -6,10 +9,29 @@
 <MudSnackbarProvider/>
 
 <MudLayout>
-    <MudAppBar>
-        <h2>RED HITO MED DRØMMEDATA</h2>
+    <MudAppBar>'
+        <MudStack Row="true" Justify="Justify.SpaceBetween" Style="width: 100%">
+            <h2>RED HITO MED DRØMMEDATA</h2>
+            <MudButton Variant="Variant.Filled" Color="Color.Dark" OnClick="OpenIntroDialog" EndIcon="@Icons.Material.Filled.HelpCenter">
+                INSTRUKTIONER
+            </MudButton>
+        </MudStack>
     </MudAppBar>
     <MudMainContent>
         @Body
     </MudMainContent>
 </MudLayout>
+
+@code
+{
+    public async Task OpenIntroDialog()
+    {
+        await DialogService.ShowAsync<IntroDialog>("", new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseOnEscapeKey = false,
+            BackdropClick = false
+        });
+    }
+}
