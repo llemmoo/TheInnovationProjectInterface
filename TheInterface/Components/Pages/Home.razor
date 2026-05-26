@@ -68,10 +68,19 @@
         <MudPaper Class="d-flex align-center justify-center mud-width-full mx-8" Elevation="4">
             <MudStack Style="width:100%; padding:16px;">
                 <MudText Typo="Typo.button" Style="align-self: center; font-size: large;">DRØMMEDATA</MudText>
-                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true"
-                           OnClick="ResetAll">
-                    Nulstil målinger
-                </MudButton>
+                <MudStack Row="true">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true"
+                               OnClick="ResetAll">
+                        Nulstil målinger
+                    </MudButton>
+                    <MudToggleIconButton 
+                        ToggledChanged="b => _debugOpen = b" 
+                        Variant="Variant.Filled" 
+                        Color="Color.Default" 
+                        ToggledColor="Color.Dark" 
+                        Icon="@Icons.Material.Filled.BugReport" 
+                        Toggled="@_debugOpen" />
+                </MudStack>
                 @if (_lockedSound.HasValue)
                 {
                     <MudStack Row="true" Justify="Justify.SpaceBetween">
@@ -187,12 +196,19 @@
                         </MudStack>
                         break;
                 }
-                <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="@(() => _confirmedDream = _candidates.FirstOrDefault())">
-                    TEST
-                </MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="@(() => _candidates = _dreams)">
-                    TEST RESET
-                </MudButton>
+                @if (_debugOpen)
+                {
+                    <MudSelect T="Dream" ValueChanged="dream => _debugDream = dream!">
+                        @foreach (var dream in _dreams)
+                        {
+                            <MudSelectItem T="Dream" Value="dream">@dream.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudButton Variant="Variant.Filled" Color="Color.Tertiary"
+                               OnClick="@(() => _confirmedDream = _debugDream!)">
+                        TEST
+                    </MudButton>
+                }
             </MudStack>
         </MudPaper>
     </MudItem>
@@ -210,64 +226,109 @@
         <MudStack AlignItems="AlignItems.Center">
             @if (_showInformationBlocks)
             {
-                <MudPaper Style="width: 1000px; height: 600px; align-items: center; justify-content: space-evenly;"
-                          Elevation="2"
-                          >
-                              <MudGrid Spacing="3" Class="pa-3">
-                                  @foreach (var informationBlock in _confirmedDream!.InformationBlocks!)
-                                  {
-                                      <MudItem xs="12" sm="6">
-                                          <MudCard Elevation="2" Class="h-100">
-                                              <MudCardHeader>
-                                                  <CardHeaderContent>
-                                                      <MudText Typo="Typo.h6" Color="Color.Primary">
-                                                          Information @informationBlock.BlockNumber
-                                                      </MudText>
-                                                  </CardHeaderContent>
-                                              </MudCardHeader>
-                                              <MudCardContent>
-                                                  <MudStack Spacing="2">
-                                                      <div>
-                                                          <MudText Typo="Typo.caption" Color="Color.Secondary">Information</MudText>
-                                                          <MudText Typo="Typo.body2">@informationBlock.BlockInformation</MudText>
-                                                      </div>
-                                                      <MudDivider />
-                                                      <div>
-                                                          <MudText Typo="Typo.caption" Color="Color.Secondary">Ledetråd</MudText>
-                                                          <MudText Typo="Typo.body2">@informationBlock.BlockInformationHighlight</MudText>
-                                                      </div>
-                                                      <MudDivider />
-                                                      <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                                                          <div>
-                                                              <MudText Typo="Typo.caption" Color="Color.Secondary">Sensor</MudText>
-                                                              <MudText Typo="Typo.body2">@informationBlock.Sensor</MudText>
-                                                          </div>
-                                                          <MudChip T="string" Color="Color.Info" Size="Size.Small" Variant="Variant.Filled">
-                                                              @informationBlock.SensorReadingValue
-                                                          </MudChip>
-                                                      </MudStack>
-                                                  </MudStack>
-                                              </MudCardContent>
-                                          </MudCard>
-                                      </MudItem>
-                                  }
-                              </MudGrid>
+                <MudPaper
+                    Style="@($"background-color: {_confirmedDream.Color}; width: 1000px; height: 600px; align-items: center; justify-content: space-evenly;")"
+                    Elevation="2"
+                >
+                    <MudGrid Spacing="3" Class="pa-3">
+                        @foreach (var informationBlock in _confirmedDream!.InformationBlocks!)
+                        {
+                            <MudItem xs="12" sm="6">
+                                <MudCard Elevation="2" Class="h-100" Style="background-color: rgba(255,255,255,0.9)">
+                                    <MudCardHeader>
+                                        <CardHeaderContent>
+                                            <MudText Typo="Typo.h6" Color="Color.Primary">
+                                                Information @informationBlock.BlockNumber
+                                            </MudText>
+                                        </CardHeaderContent>
+                                    </MudCardHeader>
+                                    <MudCardContent>
+                                        <MudStack Spacing="2">
+                                            <div>
+                                                <MudText Typo="Typo.body1"><i>@informationBlock.BlockInformation</i></MudText>
+                                            </div>
+                                            <MudDivider/>
+                                            <div>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">Ledetråd</MudText>
+                                                <MudText Typo="Typo.body2">
+                                                    <i><b>@informationBlock.BlockInformationHighlight</b></i></MudText>
+                                            </div>
+                                            <MudDivider/>
+                                            <MudStack Row="true" Justify="Justify.SpaceBetween"
+                                                      AlignItems="AlignItems.Center">
+                                                <div>
+                                                    <MudText Typo="Typo.caption" Color="Color.Secondary">Sensor
+                                                    </MudText>
+                                                    <MudText Typo="Typo.body2">
+                                                        @switch (informationBlock.Sensor)
+                                                        {
+                                                            case Sensor.Sound:
+                                                                @:Lyd
+                                                                break;
+                                                            case Sensor.Temperature:
+                                                                @:Temperatur
+                                                                break;
+                                                            case Sensor.Shake:
+                                                                @:Bevægelse
+                                                                break;
+                                                            case Sensor.Light:
+                                                                @:Lys
+                                                                break;
+                                                            default:
+                                                                @:@informationBlock.Sensor
+                                                                break;
+                                                        }
+                                                    </MudText>
+                                                </div>
+                                                    @switch (informationBlock.SensorReadingValue)
+                                                    {
+                                                        case SensorReadingValue.High:
+                                                            <MudChip T="string" Color="Color.Error" Size="Size.Small"
+                                                                     Variant="Variant.Filled">
+                                                                Høj
+                                                            </MudChip>
+                                                            break;
+                                                        case SensorReadingValue.Low:
+                                                            <MudChip T="string" Color="Color.Tertiary" Size="Size.Small"
+                                                                     Variant="Variant.Filled">
+                                                                Lav
+                                                            </MudChip>
+                                                            break;
+                                                        default:
+                                                            @:@informationBlock.SensorReadingValue
+                                                            break;
+                                                    }
+                                            </MudStack>
+                                        </MudStack>
+                                    </MudCardContent>
+                                </MudCard>
+                            </MudItem>
+                        }
+                    </MudGrid>
                 </MudPaper>
-                <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="() => _showInformationBlocks = !_showInformationBlocks"
+                <MudButton Variant="Variant.Filled" Color="Color.Info"
+                           OnClick="() => _showInformationBlocks = !_showInformationBlocks"
                            EndIcon="@Icons.Material.Filled.SwitchAccessShortcut">Se drømmefarven igen!
                 </MudButton>
             }
             else
             {
-                <MudPaper Style="@($"background-color: {_confirmedDream.Color}; width: 1000px; height: 600px;")"
-                          Elevation="0">
+                <MudPaper
+                    Style="@($"background-color: {_confirmedDream.Color}; width: 1000px; height: 600px; display: flex; align-items: center; justify-content: center;")"
+                    Elevation="1">
+                    <MudPaper Style="background-color: rgba(0,0,0,0.2); backdrop-filter: blur(4px);"
+                              Width="500px" Height="300px" Elevation="2"
+                              Class="d-flex flex-column align-center justify-center">
+                        <MudText Typo="Typo.h3" Style="color:white;">@_confirmedDream.Name</MudText>
+                    </MudPaper>
                 </MudPaper>
-                <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="() => _showInformationBlocks = !_showInformationBlocks"
-                           EndIcon="@Icons.Material.Filled.SwitchAccessShortcut">Se hvordan Data Robotten tolker informationsblokkene!
+                <MudText Typo="Typo.h4" Style="color:white;">Sådan! Vi fandt Hito!</MudText>
+                <MudButton Variant="Variant.Filled" Color="Color.Info"
+                           OnClick="() => _showInformationBlocks = !_showInformationBlocks"
+                           EndIcon="@Icons.Material.Filled.SwitchAccessShortcut">Se hvordan Data Robotten tolker
+                    informationsblokkene!
                 </MudButton>
             }
-            <MudText Typo="Typo.h3" Style="color:white;">@_confirmedDream.Name</MudText>
-            <MudText Typo="Typo.h4" Style="color:white;">Sådan! Vi fandt Hito!</MudText>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ResetAll"
                        EndIcon="@Icons.Material.Filled.Replay"> Prøv igen!
             </MudButton>
@@ -293,6 +354,8 @@
     private bool _showInformationBlocks;
     private string _bubbleColor = "#e0e0e0";
     private string _bubbleTextColor = "#212121";
+    private bool _debugOpen;
+    private Dream _debugDream;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
