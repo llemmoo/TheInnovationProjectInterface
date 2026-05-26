@@ -147,9 +147,9 @@ public class DreamRepository
                 {
                     BlockNumber = 1,
                     BlockInformation = "Hito sidder i sin Jeep og kigger ud over savannen.",
-                    BlockInformationHighlight = "... kigger ud over savannen.",
-                    Sensor = Sensor.Temperature,
-                    SensorReadingValue = SensorReadingValue.High
+                    BlockInformationHighlight = "... sidder i sin Jeep ...",
+                    Sensor = Sensor.Shake,
+                    SensorReadingValue = SensorReadingValue.Low
                 },
                 new InformationBlock
                 {
@@ -157,22 +157,22 @@ public class DreamRepository
                     BlockInformation = "Hito ser en løve, som ligger i skyggen af et træ.",
                     BlockInformationHighlight = "... i skyggen af et træ.",
                     Sensor = Sensor.Light,
-                    SensorReadingValue = SensorReadingValue.Low
+                    SensorReadingValue = SensorReadingValue.High
                 },
                 new InformationBlock
                 {
                     BlockNumber = 3,
                     BlockInformation = "Hito slukker aircondition i Jeepen, for ikke at vække løven.",
-                    BlockInformationHighlight = "... for ikke at vække løven.",
-                    Sensor = Sensor.Sound,
-                    SensorReadingValue = SensorReadingValue.Low
+                    BlockInformationHighlight = "... slukker for aircondition i Jeepen ...",
+                    Sensor = Sensor.Temperature,
+                    SensorReadingValue = SensorReadingValue.High
                 },
                 new InformationBlock
                 {
                     BlockNumber = 4,
                     BlockInformation = "Hito kommer til at kigge på sin madpakke, som får maven til at knurre. Løven løfter kort på øjet, og ligger sig til at sove igen.",
-                    BlockInformationHighlight = "... ligger sig til at sove igen.",
-                    Sensor = Sensor.Shake,
+                    BlockInformationHighlight = "... får maven til at knurre.",
+                    Sensor = Sensor.Sound,
                     SensorReadingValue = SensorReadingValue.Low
                 }
             }
@@ -205,7 +205,7 @@ public class DreamRepository
                 new InformationBlock
                 {
                     BlockNumber = 3,
-                    BlockInformation = "Hioto tisser i sin våddragt for at få varmen.",
+                    BlockInformation = "Hito tisser i sin våddragt for at få varmen.",
                     BlockInformationHighlight = "Pludseligt svømmer fisken hen ...",
                     Sensor = Sensor.Temperature,
                     SensorReadingValue = SensorReadingValue.Low

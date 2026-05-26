@@ -222,7 +222,7 @@
 
 @if (_confirmedDream is not null)
 {
-    <MudOverlay Visible="true" DarkBackground="true" OnClosed="() => _confirmedDream = null">
+    <MudOverlay Visible="@(_confirmedDream is not null)" DarkBackground="true">
         <MudStack AlignItems="AlignItems.Center">
             @if (_showInformationBlocks)
             {
@@ -231,7 +231,7 @@
                     Elevation="2"
                 >
                     <MudGrid Spacing="3" Class="pa-3">
-                        @foreach (var informationBlock in _confirmedDream!.InformationBlocks!)
+                        @foreach (var (informationBlock, index) in _confirmedDream!.InformationBlocks!.Select((b, i) => (b, i)))
                         {
                             <MudItem xs="12" sm="6">
                                 <MudCard Elevation="2" Class="h-100" Style="background-color: rgba(255,255,255,0.9)">
@@ -250,36 +250,65 @@
                                             <MudDivider/>
                                             <div>
                                                 <MudText Typo="Typo.caption" Color="Color.Secondary">Ledetråd</MudText>
-                                                <MudText Typo="Typo.body2">
-                                                    <i><b>@informationBlock.BlockInformationHighlight</b></i></MudText>
+                                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                                    <MudText Typo="Typo.body2">
+                                                        @if (!_hiddenHintBlocks.Contains(index))
+                                                        {
+                                                            <i><b>@informationBlock.BlockInformationHighlight</b></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i><b>••••••</b></i>
+                                                        }
+                                                    </MudText>
+                                                    <MudToggleIconButton
+                                                        Toggled="@_hiddenHintBlocks.Contains(index)"
+                                                        ToggledChanged="b => { if (b) _hiddenHintBlocks.Add(index); else _hiddenHintBlocks.Remove(index); }"
+                                                        Icon="@Icons.Material.Filled.Visibility"
+                                                        ToggledIcon="@Icons.Material.Filled.VisibilityOff"
+                                                        Color="Color.Default"
+                                                        ToggledColor="Color.Default"
+                                                        Size="Size.Small" />
+                                                </MudStack>
                                             </div>
                                             <MudDivider/>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary" Style="justify-self: flex-start">
+                                                Sensor
+                                            </MudText>
                                             <MudStack Row="true" Justify="Justify.SpaceBetween"
                                                       AlignItems="AlignItems.Center">
                                                 <div>
-                                                    <MudText Typo="Typo.caption" Color="Color.Secondary">Sensor
-                                                    </MudText>
                                                     <MudText Typo="Typo.body2">
-                                                        @switch (informationBlock.Sensor)
+                                                        @if (!_hiddenSensorBlocks.Contains(index))
                                                         {
-                                                            case Sensor.Sound:
-                                                                @:Lyd
-                                                                break;
-                                                            case Sensor.Temperature:
-                                                                @:Temperatur
-                                                                break;
-                                                            case Sensor.Shake:
-                                                                @:Bevægelse
-                                                                break;
-                                                            case Sensor.Light:
-                                                                @:Lys
-                                                                break;
-                                                            default:
-                                                                @:@informationBlock.Sensor
-                                                                break;
+                                                            @switch (informationBlock.Sensor)
+                                                            {
+                                                                case Sensor.Sound:
+                                                                    @:Lyd
+                                                                    break;
+                                                                case Sensor.Temperature:
+                                                                    @:Temperatur
+                                                                    break;
+                                                                case Sensor.Shake:
+                                                                    @:Bevægelse
+                                                                    break;
+                                                                case Sensor.Light:
+                                                                    @:Lys
+                                                                    break;
+                                                                default:
+                                                                    @:@informationBlock.Sensor
+                                                                    break;
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <i><b>••••••</b></i>
                                                         }
                                                     </MudText>
                                                 </div>
+                                                <div style="display: flex;">
+                                                @if (!_hiddenSensorBlocks.Contains(index))
+                                                {
                                                     @switch (informationBlock.SensorReadingValue)
                                                     {
                                                         case SensorReadingValue.High:
@@ -298,6 +327,23 @@
                                                             @:@informationBlock.SensorReadingValue
                                                             break;
                                                     }
+                                                }
+                                                else
+                                                {
+                                                    <MudChip T="string" Color="Color.Dark" Size="Size.Small"
+                                                             Variant="Variant.Filled">
+                                                        ???
+                                                    </MudChip>
+                                                }
+                                                <MudToggleIconButton
+                                                        Toggled="@_hiddenSensorBlocks.Contains(index)"
+                                                        ToggledChanged="b => { if (b) _hiddenSensorBlocks.Add(index);else _hiddenSensorBlocks.Remove(index); }"
+                                                        Icon="@Icons.Material.Filled.Visibility"
+                                                        ToggledIcon="@Icons.Material.Filled.VisibilityOff"
+                                                        Color="Color.Default"
+                                                        ToggledColor="Color.Default"
+                                                        Size="Size.Small"/>
+                                                </div>
                                             </MudStack>
                                         </MudStack>
                                     </MudCardContent>
@@ -355,7 +401,11 @@
     private string _bubbleColor = "#e0e0e0";
     private string _bubbleTextColor = "#212121";
     private bool _debugOpen;
-    private Dream _debugDream;
+    private Dream? _debugDream;
+    private HashSet<int> _hiddenHintBlocks = [0,1,2,3];
+    private HashSet<int> _hiddenSensorBlocks = [0,1,2,3];
+
+        
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -425,6 +475,9 @@
         _candidates = _dreams;
         _confirmedDream = null;
         _showGuessDialog = false;
+        _hiddenHintBlocks = [0, 1, 2, 3];
+        _hiddenSensorBlocks = [0, 1, 2, 3];
+        _showInformationBlocks = false;
     }
 
     private async Task Reset(Sensor sensorToReset)
@@ -606,6 +659,13 @@
     private async Task TriggerTada()
     {
         await PlaySoundAsync("tada");
+    }
+
+    private void OverlayOnClosed()
+    {
+        _confirmedDream = null;
+        _hiddenHintBlocks = [0, 1, 2, 3];
+        _hiddenSensorBlocks = [0, 1, 2, 3];
     }
 
 }
