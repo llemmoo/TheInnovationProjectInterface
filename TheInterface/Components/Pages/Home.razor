@@ -227,7 +227,7 @@
             @if (_showInformationBlocks)
             {
                 <MudPaper
-                    Style="@($"background-color: {_confirmedDream.Color}; width: 1000px; height: 600px; align-items: center; justify-content: space-evenly;")"
+                    Style="@($"background-color: {_confirmedDream.Color}; width: 1000px; height: 700px; align-items: center; justify-content: space-evenly;")"
                     Elevation="2"
                 >
                     <MudGrid Spacing="3" Class="pa-3">
@@ -237,7 +237,7 @@
                                 <MudCard Elevation="2" Class="h-100" Style="background-color: rgba(255,255,255,0.9)">
                                     <MudCardHeader>
                                         <CardHeaderContent>
-                                            <MudText Typo="Typo.h6" Color="Color.Primary">
+                                            <MudText Typo="Typo.h5" Color="Color.Primary">
                                                 Information @informationBlock.BlockNumber
                                             </MudText>
                                         </CardHeaderContent>
@@ -249,9 +249,9 @@
                                             </div>
                                             <MudDivider/>
                                             <div>
-                                                <MudText Typo="Typo.caption" Color="Color.Secondary">Ledetråd</MudText>
+                                                <MudText Typo="Typo.h6" Color="Color.Secondary">Ledetråd</MudText>
                                                 <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                                                    <MudText Typo="Typo.body2">
+                                                    <MudText Typo="Typo.body1">
                                                         @if (!_hiddenHintBlocks.Contains(index))
                                                         {
                                                             <i><b>@informationBlock.BlockInformationHighlight</b></i>
@@ -268,17 +268,17 @@
                                                         ToggledIcon="@Icons.Material.Filled.VisibilityOff"
                                                         Color="Color.Default"
                                                         ToggledColor="Color.Default"
-                                                        Size="Size.Small" />
+                                                        Size="Size.Medium" />
                                                 </MudStack>
                                             </div>
                                             <MudDivider/>
-                                            <MudText Typo="Typo.caption" Color="Color.Secondary" Style="justify-self: flex-start">
+                                            <MudText Typo="Typo.h6" Color="Color.Secondary" Style="justify-self: flex-start">
                                                 Sensor
                                             </MudText>
                                             <MudStack Row="true" Justify="Justify.SpaceBetween"
                                                       AlignItems="AlignItems.Center">
                                                 <div>
-                                                    <MudText Typo="Typo.body2">
+                                                    <MudText Typo="Typo.body1">
                                                         @if (!_hiddenSensorBlocks.Contains(index))
                                                         {
                                                             @switch (informationBlock.Sensor)
@@ -312,13 +312,13 @@
                                                     @switch (informationBlock.SensorReadingValue)
                                                     {
                                                         case SensorReadingValue.High:
-                                                            <MudChip T="string" Color="Color.Error" Size="Size.Small"
+                                                            <MudChip T="string" Color="Color.Error" Size="Size.Medium"
                                                                      Variant="Variant.Filled">
                                                                 Høj
                                                             </MudChip>
                                                             break;
                                                         case SensorReadingValue.Low:
-                                                            <MudChip T="string" Color="Color.Tertiary" Size="Size.Small"
+                                                            <MudChip T="string" Color="Color.Tertiary" Size="Size.Medium"
                                                                      Variant="Variant.Filled">
                                                                 Lav
                                                             </MudChip>
@@ -330,7 +330,7 @@
                                                 }
                                                 else
                                                 {
-                                                    <MudChip T="string" Color="Color.Dark" Size="Size.Small"
+                                                    <MudChip T="string" Color="Color.Dark" Size="Size.Medium"
                                                              Variant="Variant.Filled">
                                                         ???
                                                     </MudChip>
@@ -342,7 +342,7 @@
                                                         ToggledIcon="@Icons.Material.Filled.VisibilityOff"
                                                         Color="Color.Default"
                                                         ToggledColor="Color.Default"
-                                                        Size="Size.Small"/>
+                                                        Size="Size.Medium"/>
                                                 </div>
                                             </MudStack>
                                         </MudStack>
@@ -360,7 +360,7 @@
             else
             {
                 <MudPaper
-                    Style="@($"background-color: {_confirmedDream.Color}; width: 1000px; height: 600px; display: flex; align-items: center; justify-content: center;")"
+                    Style="@($"background-color: {_confirmedDream.Color}; width: 1100px; height: 700px; display: flex; align-items: center; justify-content: center;")"
                     Elevation="1">
                     <MudPaper Style="background-color: rgba(0,0,0,0.2); backdrop-filter: blur(4px);"
                               Width="500px" Height="300px" Elevation="2"
