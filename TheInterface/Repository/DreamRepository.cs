@@ -248,10 +248,10 @@ public class DreamRepository
                 new InformationBlock
                 {
                     BlockNumber = 3,
-                    BlockInformation = "Hito ser en pige, der er væltet på ski.",
-                    BlockInformationHighlight = "... på ski.",
+                    BlockInformation = "Hito flyver ned til en pige, der er faldet over en engangsgrill.",
+                    BlockInformationHighlight = "... over en engangsgrill.",
                     Sensor = Sensor.Temperature,
-                    SensorReadingValue = SensorReadingValue.Low
+                    SensorReadingValue = SensorReadingValue.High
                 },
                 new InformationBlock
                 {
@@ -259,7 +259,7 @@ public class DreamRepository
                     BlockInformation = "Hito flyver ned og rejser hende op. Det går så hurtigt, at ingen ligger mærke til noget.",
                     BlockInformationHighlight = "... ingen ligger mærke til noget.",
                     Sensor = Sensor.Sound,
-                    SensorReadingValue = SensorReadingValue.High
+                    SensorReadingValue = SensorReadingValue.Low
                 }
             }
         },
@@ -291,8 +291,8 @@ public class DreamRepository
                 new InformationBlock
                 {
                     BlockNumber = 3,
-                    BlockInformation = "Det er kun Hito, som er nattevagt. Ingen kan derfor hjælpe Hito. ",
-                    BlockInformationHighlight = "... som er nattevagt.",
+                    BlockInformation = "Det er Hitos tur til at være nattevagt",
+                    BlockInformationHighlight = "... at være nattevagt.",
                     Sensor = Sensor.Light,
                     SensorReadingValue = SensorReadingValue.Low
                 },
